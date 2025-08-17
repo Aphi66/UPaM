@@ -756,11 +756,36 @@
         }
 
         function nextStep() {
-            if (selectedDate && selectedTime) {
-                alert(`คุณเลือกวันที่: ${formatThaiDate(selectedDate)}\nเวลา: ${selectedTime}\n\nกำลังไปยังขั้นตอนถัดไป...`);
-                // Here you would typically navigate to the next page or step
+            const appointment = {
+                user_id: 1,
+                service_id: 2,
+                appointment_date: selectedDate ? selectedDate.toISOString().split('T')[0] : '',
+                time_slot: selectedTime || '',
+                status: 'รอดำเนินการ'
+            };
+
+            if (!appointment.appointment_date || !appointment.time_slot) {
+                alert('⚠️ กรุณาเลือกวันที่และเวลานัดหมาย');
+                return;
             }
+
+            fetch('http://localhost:3000/Date', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(appointment)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`✅ ${data.message}`);
+                } else {
+                    alert(`⚠️ ${data.message || 'เกิดข้อผิดพลาดในการจอง'}`);
+                }
+            })
+            .catch(err => alert('❌ เกิดข้อผิดพลาด: ' + err.message));
         }
+
+
 
         function goBack() {
             alert('กลับไปหน้าก่อนหน้า');
